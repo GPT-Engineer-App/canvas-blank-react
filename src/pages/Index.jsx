@@ -1,12 +1,14 @@
-import { Container, Text, VStack, Box, Flex, Spacer, IconButton, useBreakpointValue, Button } from "@chakra-ui/react";
+import { Container, Text, VStack, Box, Flex, Spacer, IconButton, useBreakpointValue, Button, Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import { useSupabaseAuth } from "../integrations/supabase/auth.jsx";
 import { useNavigate } from "react-router-dom";
 import { FaHome, FaInfoCircle, FaCog } from "react-icons/fa";
+import { useEvents } from "../integrations/supabase/index.js";
 
 const Index = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const { session, logout } = useSupabaseAuth();
   const navigate = useNavigate();
+  const { data: events, isLoading } = useEvents();
 
   return (
     <Container maxW="container.xl" p={0}>
@@ -31,9 +33,39 @@ const Index = () => {
               Login
             </Button>
           ) : (
-            <Button onClick={logout} colorScheme="red">
-              Logout
-            </Button>
+            <>
+              <Button onClick={logout} colorScheme="red">
+                Logout
+              </Button>
+              {isLoading ? (
+                <Text>Loading events...</Text>
+              ) : (
+                <Table variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th>Name</Th>
+                      <Th>Date</Th>
+                      <Th>Description</Th>
+                      <Th>Actions</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {events.map(event => (
+                      <Tr key={event.id}>
+                        <Td>{event.name}</Td>
+                        <Td>{event.date}</Td>
+                        <Td>{event.description}</Td>
+                        <Td>
+                          <Button onClick={() => navigate(`/events/${event.id}`)} colorScheme="blue">
+                            View Details
+                          </Button>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              )}
+            </>
           )}
         </VStack>
       </Container>
