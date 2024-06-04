@@ -1,8 +1,12 @@
-import { Container, Text, VStack, Box, Flex, Spacer, IconButton, useBreakpointValue } from "@chakra-ui/react";
+import { Container, Text, VStack, Box, Flex, Spacer, IconButton, useBreakpointValue, Button } from "@chakra-ui/react";
+import { useSupabaseAuth } from "../integrations/supabase/auth.jsx";
+import { useNavigate } from "react-router-dom";
 import { FaHome, FaInfoCircle, FaCog } from "react-icons/fa";
 
 const Index = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const { session, logout } = useSupabaseAuth();
+  const navigate = useNavigate();
 
   return (
     <Container maxW="container.xl" p={0}>
@@ -22,6 +26,15 @@ const Index = () => {
         <VStack spacing={4}>
           <Text fontSize="2xl">Your Blank Canvas</Text>
           <Text>Chat with the agent to start making edits.</Text>
+        {!session ? (
+            <Button onClick={() => navigate("/login")} colorScheme="blue">
+              Login
+            </Button>
+          ) : (
+            <Button onClick={logout} colorScheme="red">
+              Logout
+            </Button>
+          )}
         </VStack>
       </Container>
     </Container>
